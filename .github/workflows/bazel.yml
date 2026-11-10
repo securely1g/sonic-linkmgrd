@@ -20,8 +20,6 @@ jobs:
       BAZELISK_GITHUB_TOKEN: ""
       CI_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-      # Temporary review catalog for unlanded native tool/library interfaces.
-      SONIC_BAZEL_REGISTRY_REVISION: 46428f1a59a3988f603bd3f3165136fd4d8c1960
     defaults:
       run:
         shell: bash
@@ -40,7 +38,7 @@ jobs:
           repository-cache: true
           disk-cache: linkmgrd-amd64
           cache-version: "8.5.1"
-      - name: Select the review catalog and preserve caches
+      - name: Check the native worker and preserve Bazel caches
         run: |
           test "$(uname -m)" = x86_64
           test "$(. /etc/os-release; echo "$VERSION_CODENAME")" = trixie
@@ -70,7 +68,7 @@ jobs:
             bazel-evidence/provenance.json
             bazel-evidence/runtime_packages.json
             bazel-evidence/resolve*.txt
-            bazel-evidence/review.bazelrc
+            bazel-evidence/registry.bazelrc
             bazel-evidence/MODULE.bazel.lock
             bazel-evidence/tests/
           if-no-files-found: error

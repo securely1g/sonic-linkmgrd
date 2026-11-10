@@ -25,7 +25,6 @@ jobs:
       BAZELISK_GITHUB_TOKEN: ""
       CI_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
       CI_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-      SONIC_BAZEL_REGISTRY_REVISION: 46428f1a59a3988f603bd3f3165136fd4d8c1960
     defaults:
       run:
         shell: bash
@@ -43,7 +42,7 @@ jobs:
           bazelisk-cache: true
           repository-cache: true
           cache-version: "8.5.1"
-      - name: Select the review catalog
+      - name: Preserve Bazel cache settings
         run: python3 tools/bazel/prepare_ci.py
       - name: Verify evidence and shallow-checkout guards
         run: python3 -B tools/bazel/evidence_test.py

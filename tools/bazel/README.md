@@ -24,13 +24,11 @@ No target generates a Debian package. Existing Debian/Make packaging remains
 available separately. The root `.bazelrc` uses the maintained registry and BCR.
 `MODULE.bazel.lock` is generated and retained as CI evidence, not committed.
 
-During Draft review, the workflow selects one immutable complete catalog for
-the unlanded registrations. A local native Trixie checkout can use the same
-review inputs, with Bazelisk/Bazel 8.5.1 and the execution tools listed in CI:
+Native CI and local builds use the maintained registry. Run the following
+on a native Trixie checkout with Bazelisk/Bazel 8.5.1 and the execution
+tools listed in CI.
 
 ```sh
-export SONIC_BAZEL_REGISTRY_REVISION=46428f1a59a3988f603bd3f3165136fd4d8c1960
-export BAZEL_BINARY="$(python3 tools/bazel/prepare_ci.py)"
 python3 tools/bazel/validate.py audit
 python3 tools/bazel/validate.py build
 python3 tools/bazel/validate.py incremental

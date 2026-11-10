@@ -5,8 +5,10 @@ load("@rules_gzip//gzip/compress:defs.bzl", "gzip_compress")
 load("@rules_python//python:py_test.bzl", "py_test")
 load("@sonic_build_infra//binary:drop_build_rpath.bzl", "drop_build_rpath")
 load("@sonic_build_infra//cc:runtime_test.bzl", "native_runtime_test")
+load("@sonic_build_infra//cc:shared_library.bzl", "shared_library_cc_info")
 load("@sonic_build_infra//oci:runtime_packages.bzl", "runtime_packages")
 load("@sonic_build_infra//tar:sonic_deploy_tar.bzl", "sonic_deploy_tar")
+load("//:tools/bazel/swsscommon.bzl", "linkmgrd_swsscommon")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -23,11 +25,26 @@ _COPTS = [
     "-fPIC",
 ]
 
+# Forward Common's native library and its libnl DSOs with only the search
+# paths and declared files needed to resolve their Debian dependencies.
+shared_library_cc_info(
+    name = "swsscommon_dso",
+    runtime_deps = ["@sonic_swss_common//:common_deps"],
+    shared_library = "@sonic_swss_common//:libswsscommon_consolidated.so",
+    visibility = ["//visibility:private"],
+)
+
+linkmgrd_swsscommon(
+    name = "swsscommon",
+    headers = "@sonic_swss_common//:libswsscommon_shared",
+    library = ":swsscommon_dso",
+    visibility = ["//visibility:private"],
+)
+
 _DEPS = [
     ":headers",
-    "@sonic_swss_common//:libswsscommon_shared",
-    "@libnl3//:libnl_3",
-    "@libnl3//:libnl_route_3",
+    ":swsscommon",
+    "@libnl3//:headers",
     "@trixie//libboost-date-time1.83-dev:libboost_date_time_cc",
     "@trixie//libboost-thread1.83-dev:libboost_thread_cc",
     "@trixie//libboost-log1.83-dev:libboost_log_cc",
@@ -99,11 +116,6 @@ cc_binary(
     copts = _COPTS + [
         "-O3",
         "-flto",
-    ],
-    dynamic_deps = [
-        "@sonic_swss_common//:libswsscommon_consolidated.so",
-        "@libnl3//:libnl_3_shared",
-        "@libnl3//:libnl_route_3_shared",
     ],
     linkopts = ["-pthread"],
     linkstatic = False,
@@ -185,11 +197,6 @@ cc_binary(
     testonly = True,
     srcs = ["test/LinkMgrdTestMain.cpp"],
     copts = _COPTS + ["-O0"],
-    dynamic_deps = [
-        "@sonic_swss_common//:libswsscommon_consolidated.so",
-        "@libnl3//:libnl_3_shared",
-        "@libnl3//:libnl_route_3_shared",
-    ],
     linkopts = ["-pthread"],
     linkstatic = False,
     local_defines = [

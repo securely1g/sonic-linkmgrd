@@ -64,6 +64,9 @@ class PackageTest(unittest.TestCase):
         self.assertEqual(gzip.decompress((self.root / doc).read_bytes()), CHANGELOG.read_bytes())
         self.assertEqual(self.elf.machine, 62)
         self.assertEqual(self.elf.bits, 64)
+        for soname in ('libswsscommon.so.0', 'libnl-3.so.200', 'libnl-route-3.so.200'):
+            with self.subTest(required_shared_library=soname):
+                self.assertIn(soname, self.elf.needed)
         self.assertNotIn('.debug_info', self.elf.by_name)
         self.assertIsNotNone(self.elf.build_id)
         expected = 'usr/lib/debug/.build-id/' + self.elf.build_id[:2] + '/' + self.elf.build_id[2:] + '.debug'

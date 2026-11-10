@@ -234,7 +234,6 @@ def collect():
         'tested_revision': revision, 'parents': parents, 'pull_request_head': head,
         'pull_request_base': base, 'architecture': platform.machine(),
         'os_release': Path('/etc/os-release').read_text(),
-        'draft_registry_revision': os.environ.get('SONIC_BAZEL_REGISTRY_REVISION', ''),
         'outputs': outputs, 'tests': summaries,
         'scope': 'Native AMD64/Trixie, source-owned runtime/debug TARs and metadata; no DEB generation',
     }, indent=2) + '\n')
