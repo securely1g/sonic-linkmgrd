@@ -28,6 +28,8 @@ Native CI and local builds use the maintained registry. Run the following
 on a native Trixie checkout with Bazelisk/Bazel 8.5.1 and the execution
 tools listed in CI.
 
+Install the `python3-defusedxml` package to read the Bazel JUnit reports.
+
 ```sh
 python3 tools/bazel/validate.py audit
 python3 tools/bazel/validate.py build

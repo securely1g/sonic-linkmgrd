@@ -11,8 +11,9 @@ import shutil
 import subprocess
 import time
 from urllib.parse import unquote, urlparse
-import xml.etree.ElementTree as ET
 import zipfile
+
+from defusedxml import ElementTree as ET
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -240,8 +241,9 @@ def collect():
 
 
 if __name__ == '__main__':
+    commands = {'audit': audit, 'build': build, 'incremental': incremental, 'collect': collect}
     parser = argparse.ArgumentParser()
-    parser.add_argument('command', choices=('audit', 'build', 'incremental', 'collect'))
+    parser.add_argument('command', choices=commands)
     args = parser.parse_args()
     OUT.mkdir(exist_ok=True)
     identity = checkout_identity()
@@ -251,4 +253,4 @@ if __name__ == '__main__':
     else:
         assert identity == json.loads(identity_file.read_text()), 'Source identity changed since action audit'
         assert json.loads((OUT / 'action-audit.json').read_text())['status'] == 'passed'
-    globals()[args.command]()
+    commands[args.command]()

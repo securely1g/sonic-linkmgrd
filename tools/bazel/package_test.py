@@ -28,10 +28,13 @@ def unpack(path, destination):
         if len(names) != len(set(names)):
             raise AssertionError('Duplicate installed path')
         for member in members:
-            if member.isfile():
-                assert member.uid == member.gid == 0, member.name
-                assert member.mtime == 1672560000, (member.name, member.mtime)
-        archive.extractall(destination, filter='data')
+            if member.isdir():
+                continue
+            if not member.isfile():
+                raise AssertionError(f'Unexpected package member type: {member.name}')
+            assert member.uid == member.gid == 0, member.name
+            assert member.mtime == 1672560000, (member.name, member.mtime)
+            archive.extract(member, destination, filter='data')
         return {m.name.removeprefix('./'): m for m in members if m.isfile()}
 
 
